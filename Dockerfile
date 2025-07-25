@@ -1,38 +1,31 @@
-# Imagem base oficial Python 3.11 slim (menor e segura)
+# Imagem base oficial Python 3.11 slim (mais leve)
 FROM python:3.11-slim
 
-# Definir diretório de trabalho dentro do container
+# Diretório de trabalho dentro do container
 WORKDIR /app
 
-# Evitar criar arquivos __pycache__ e bytecode no container
+# Evitar criação de arquivos .pyc e buffer no stdout/stderr (útil para logs)
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Atualizar pacotes e instalar dependências do sistema necessárias
+# Atualizar pacotes e instalar dependências do sistema (curl e gcc podem ser necessários)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
-    libpq-dev \
     curl \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar arquivo de dependências primeiro para aproveitar cache do Docker
+# Copiar arquivo de dependências para cache do Docker
 COPY requirements.txt .
 
-# Instalar dependências Python com cache desligado para imagem leve
+# Instalar dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo o código da aplicação para o container
+# Copiar o código fonte para dentro do container
 COPY . .
 
-# Definir variáveis de ambiente para o Flask
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
-ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=5000
-
-# Expõe a porta que o Flask vai usar
+# Expõe a porta onde o Flask irá rodar
 EXPOSE 5000
 
-# Usar Gunicorn para rodar o app Flask em produção com múltiplos workers
+# Comando para iniciar o servidor Gunicorn com 4 workers
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app:app"]
