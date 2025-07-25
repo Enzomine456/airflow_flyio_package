@@ -1,4 +1,4 @@
-app = "Air Flow"
+app = "air-flow"
 
 [build]
   dockerfile = "Dockerfile"
