@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Air Flow AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --roxo: #7c3aed;
+            --roxo-claro: #ede9fe;
+            --roxo-escuro: #4c1d95;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--roxo-claro);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            color: var(--roxo-escuro);
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        form {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-size: 1.1em;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--roxo);
+            outline: none;
+        }
+
+        .btn {
+            background: var(--roxo);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--roxo-escuro);
+        }
+
+        .output {
+            margin-top: 40px;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+
+        .error {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Air Flow AI — Geração de Vídeo</h1>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="prompt" placeholder="Descreva o vídeo que deseja gerar...">{{ prompt }}</textarea>
+        <button type="submit" class="btn">🎬 Gerar vídeo</button>
+    </form>
+
+    <div class="output">
+        {% if video_path %}
+            <video controls>
+                <source src="{{ video_path }}" type="video/mp4">
+            </video>
+        {% elif error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
