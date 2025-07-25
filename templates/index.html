@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Air Flow AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <title>Air Flow AI — Geração de Vídeo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         :root {
             --roxo: #7c3aed;
@@ -21,13 +21,11 @@
             align-items: center;
             padding: 30px 20px;
         }
-
         h1 {
             color: var(--roxo-escuro);
             font-size: 2.2em;
             margin-bottom: 20px;
         }
-
         form {
             width: 100%;
             max-width: 700px;
@@ -39,7 +37,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
-
         textarea {
             resize: vertical;
             min-height: 120px;
@@ -49,12 +46,10 @@
             border: 2px solid #ddd;
             transition: border-color 0.3s;
         }
-
         textarea:focus {
             border-color: var(--roxo);
             outline: none;
         }
-
         .btn {
             background: var(--roxo);
             color: white;
@@ -65,33 +60,44 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .btn:hover {
             background: var(--roxo-escuro);
         }
-
         .output {
             margin-top: 40px;
             max-width: 700px;
             width: 100%;
         }
-
         video {
             width: 100%;
             border-radius: 12px;
             box-shadow: 0 0 12px rgba(0,0,0,0.1);
         }
-
         .error {
             color: red;
             margin-top: 20px;
+        }
+        .flash-message {
+            margin-top: 20px;
+            color: red;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <h1>Air Flow AI — Geração de Vídeo</h1>
-    <form method="post">
-        {% csrf_token %}
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-message">
+          {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <form method="post" novalidate>
         <textarea name="prompt" placeholder="Descreva o vídeo que deseja gerar...">{{ prompt }}</textarea>
         <button type="submit" class="btn">🎬 Gerar vídeo</button>
     </form>
@@ -99,10 +105,9 @@
     <div class="output">
         {% if video_path %}
             <video controls>
-                <source src="{{ video_path }}" type="video/mp4">
+                <source src="{{ video_path }}" type="video/mp4" />
+                Seu navegador não suporta vídeo.
             </video>
-        {% elif error %}
-            <p class="error">{{ error }}</p>
         {% endif %}
     </div>
 </body>
