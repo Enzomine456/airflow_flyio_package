@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.conf import settings
 import openai
 
-openai.api_key = "SUA_OPENAI_KEY"
+openai.api_key = "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"
 
 SAVE_FOLDER = os.path.join(settings.BASE_DIR, 'media/videos')
 os.makedirs(SAVE_FOLDER, exist_ok=True)
