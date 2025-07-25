@@ -20,8 +20,8 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Expõe a porta
+# Expõe a porta padrão do app
 EXPOSE 5000
 
-# Comando para iniciar a aplicação
+# Comando para iniciar a aplicação com Gunicorn
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
