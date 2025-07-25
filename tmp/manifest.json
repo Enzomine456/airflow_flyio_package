@@ -1,0 +1,30 @@
+{
+  "build": {
+    "builder": "dockerfile",
+    "dockerfilePath": "Dockerfile"
+  },
+  "env": {
+    "PORT": "5000"
+  },
+  "services": [
+    {
+      "protocol": "tcp",
+      "internal_port": 5000,
+      "ports": [
+        {
+          "port": 80
+        }
+      ]
+    }
+  ],
+  "mounts": [],
+  "checks": {
+    "http": {
+      "type": "http",
+      "interval": "10s",
+      "timeout": "2s",
+      "path": "/",
+      "method": "get"
+    }
+  }
+}
