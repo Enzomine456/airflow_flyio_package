@@ -20,7 +20,7 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Expõe a porta (opcional com Fly.io)
+# Expõe a porta
 EXPOSE 5000
 
 # Comando para iniciar a aplicação
