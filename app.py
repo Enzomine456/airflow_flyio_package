@@ -1,48 +1,15 @@
-from flask import Flask, render_template_string, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for, flash
 import openai
 import requests
 import os
 import time
 
-openai.api_key = "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"
+openai.api_key = "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"  # sua chave aqui
 SAVE_FOLDER = "videos"
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
-
-HTML = """
-<!DOCTYPE html>
-<html lang='pt-br'>
-<head>
-    <meta charset='UTF-8'>
-    <title>Air Flow AI</title>
-    <style>
-        body { background: #faf7ff; font-family: 'Segoe UI'; text-align: center; padding: 40px; color: #333; }
-        textarea, input[type=submit] {
-            width: 90%; font-size: 1.1em; padding: 12px; margin-top: 20px;
-            background: #f0e8ff; border: 2px solid #d1c4e9; border-radius: 8px;
-        }
-        video, canvas {
-            margin-top: 30px;
-            width: 90%; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        .output { margin-top: 30px; background: #f5f0ff; padding: 20px; border-radius: 10px; }
-        .purple-btn {
-            background: #c084fc; color: white; border: none; padding: 12px 24px;
-            border-radius: 8px; font-size: 1em; cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <h1>Air Flow AI — Geração de Vídeo</h1>
-    <form method="post">
-        <textarea name="prompt" placeholder="Descreva o vídeo que deseja gerar...">%s</textarea><br>
-        <input type="submit" value="Gerar vídeo" class="purple-btn">
-    </form>
-    %s
-</body>
-</html>
-"""
+app.secret_key = "uma-chave-secreta-muito-forte"  # para mensagens flash
 
 def gerar_video(prompt):
     try:
@@ -55,6 +22,7 @@ def gerar_video(prompt):
         url = response["data"]["url"]
         nome_arquivo = f"{SAVE_FOLDER}/{int(time.time())}.mp4"
         r = requests.get(url)
+        r.raise_for_status()
         with open(nome_arquivo, "wb") as f:
             f.write(r.content)
         return nome_arquivo
@@ -64,21 +32,30 @@ def gerar_video(prompt):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    prompt = ""
-    resposta_html = ""
     if request.method == "POST":
-        prompt = request.form["prompt"]
+        prompt = request.form.get("prompt", "").strip()
+        if not prompt:
+            flash("Por favor, escreva uma descrição para gerar o vídeo.", "error")
+            return redirect(url_for("index"))
+
         caminho = gerar_video(prompt)
         if caminho:
             nome = os.path.basename(caminho)
-            resposta_html = f'<div class="output"><video controls><source src="/video/{nome}" type="video/mp4"></video></div>'
+            video_url = url_for("video", nome=nome)
+            return template("index.html", prompt=prompt, video_url=video_url)
         else:
-            resposta_html = '<p class="output" style="color:red;">Erro ao gerar vídeo</p>'
-    return render_template_string(HTML % (prompt, resposta_html))
+            flash("Erro ao gerar vídeo. Tente novamente mais tarde.", "error")
+            return redirect(url_for("index"))
+
+    return template("index.html", prompt="", video_url=None)
 
 @app.route("/video/<nome>")
 def video(nome):
-    return send_file(os.path.join(SAVE_FOLDER, nome), mimetype="video/mp4")
+    caminho = os.path.join(SAVE_FOLDER, nome)
+    if os.path.exists(caminho):
+        return send_file(caminho, mimetype="video/mp4")
+    else:
+        return "Vídeo não encontrado", 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
