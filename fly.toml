@@ -1,8 +1,7 @@
-app = "airflow-ai"
-primary_region = "gru"
+app = "Air Flow"
 
 [build]
-  dockerfile = "Dockerfile"  # ✅ Corrige o build para usar seu Dockerfile
+  dockerfile = "Dockerfile"
 
 [env]
   PORT = "5000"
@@ -12,9 +11,4 @@ primary_region = "gru"
   protocol = "tcp"
 
   [[services.ports]]
-    handlers = ["http"]
     port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
