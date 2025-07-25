@@ -1,14 +1,48 @@
 app = "air-flow"
 
+# Build configurações
 [build]
   dockerfile = "Dockerfile"
 
+# Variáveis de ambiente
 [env]
-  PORT = "5000"
+  PORT = "5000"                 # Porta onde o app roda internamente
+  FLY_REGION = "gru"            # Região padrão (exemplo São Paulo)
+  NODE_ENV = "production"       # Exemplo variável para Node.js (ajuste conforme seu app)
+  LOG_LEVEL = "info"            # Nível de logs
+  # Outras variáveis que seu app precisar
 
+# Configurações do serviço
 [[services]]
-  internal_port = 5000
-  protocol = "tcp"
+  internal_port = 5000          # Porta interna do container
+  protocol = "tcp"              # Protocolo usado
 
+  # Health check - importante para monitorar se o app está vivo
+  [services.healthcheck]
+    interval = 10000            # checa a cada 10 segundos
+    timeout = 2000              # timeout da checagem em 2 segundos
+    grace_period = "10s"        # tempo inicial para o app iniciar antes da primeira checagem
+    restart_limit = 6           # número máximo de tentativas antes de reiniciar
+    method = "tcp"              # método do healthcheck (pode ser http ou tcp)
+
+  # Configuração da porta pública
   [[services.ports]]
-    port = 80
+    port = 80                   # porta externa pública
+    handlers = ["http"]         # handlers para HTTP (redireciona para HTTP/HTTPS)
+    # Pode adicionar "tls" para habilitar TLS, ex: handlers = ["http", "tls"]
+
+  # Configuração para escalabilidade e balanceamento
+  [[services.tcp_checks]]
+    interval = 10000            # checagem TCP
+    timeout = 2000
+
+# Escala de instâncias mínima e máxima
+[scale]
+  min_count = 1                 # instâncias mínimas
+  max_count = 3                 # instâncias máximas, ajuste conforme demanda
+
+# Opções extras para deploy (retries, timeouts)
+[deploy]
+  strategy = "rolling"          # estratégia de deploy
+  rollout_time = 600            # rollout de 10 minutos para garantir estabilidade
+
